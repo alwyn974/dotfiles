@@ -4,6 +4,10 @@ OLD_USER="$USER"
 
 # Install packages
 
+if [[ $EUID -eq 0 ]]; then
+   apt install sudo -y
+fi
+
 sudo apt update -y
 sudo apt install ca-certificates curl gnupg nala -y # Docker & Nala
 
