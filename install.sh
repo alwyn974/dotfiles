@@ -37,13 +37,38 @@ COMMON_PACKAGES=(
 )
 
 PERSONAL_PACKAGES=(
-    pnpm
+    pnpm # https://pnpm.io/installation#on-posix-systems
 )
 
 VPS_PACKAGES=(
     caddy
 )
 
-sudo nala install ${PACKAGES[@]}
+switch ($TYPE) {
+    case "personal":
+        PACKAGES=($COMMON_PACKAGES $PERSONAL_PACKAGES)
+        break
+    case "vps":
+        PACKAGES=($COMMON_PACKAGES $VPS_PACKAGES)
+        break
+    default:
+        PACKAGES=($COMMON_PACKAGES)
+        break
+}
+
+sudo nala install -y ${PACKAGES[@]}
 
 # Setup
+
+# Docker
+sudo groupadd docker
+sudo usermod -aG docker $OLD_USER
+newgrp docker
+
+# Zsh
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+cp .zshrc $HOME/.zshrc
+cp .p10k.zsh $HOME/.p10k.zsh
+source $HOME/.zshrc
