@@ -48,7 +48,6 @@ COMMON_PACKAGES=(
     neofetch
     bpytop
     nano
-    git
     curl
     wget
     tar
@@ -57,7 +56,9 @@ COMMON_PACKAGES=(
     containerd.io
     docker-buildx-plugin
     docker-compose-plugin
+    ufw
 )
+echo 
 
 PERSONAL_PACKAGES=(
     pnpm # https://pnpm.io/installation#on-posix-systems
@@ -69,16 +70,17 @@ VPS_PACKAGES=(
 
 case "$TYPE" in
     "personal")
-        PACKAGES=($COMMON_PACKAGES $PERSONAL_PACKAGES)
+        PACKAGES=(${COMMON_PACKAGES[@]} ${PERSONAL_PACKAGES[@]})
         ;;
     "vps")
-        PACKAGES=($COMMON_PACKAGES $VPS_PACKAGES)
+        PACKAGES=(${COMMON_PACKAGES[@]} ${VPS_PACKAGES[@]})
         ;;
     *)
-        PACKAGES=($COMMON_PACKAGES)
+        PACKAGES=(${COMMON_PACKAGES[@]})
         ;;
 esac
 
+echo "Installing packages: ${PACKAGES[@]}"
 sudo nala install -y ${PACKAGES[@]}
 
 # Setup
