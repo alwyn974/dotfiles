@@ -1,8 +1,21 @@
 #!/bin/env bash
 
-TYPE=($1:-vps) # personal/vps
-
+TYPE="${1:-vps}" # personal/vps
 OLD_USER="$USER"
+
+case "$TYPE" in
+    "personal")
+        echo "Installing personal packages"
+        ;;
+    "vps")
+        echo "Installing VPS packages"
+        ;;
+    *)
+        echo "Invalid type: $TYPE"
+        echo "Valid types: personal, vps"
+        exit 1
+        ;;
+esac
 
 # Install packages
 
@@ -12,7 +25,7 @@ fi
 
 sudo apt update -y
 sudo apt install ca-certificates curl gnupg -y # Docker & Nala
-
+echo $TYPE
 # Add Docker's official GPG key:
 sudo install -m 0755 -d /etc/apt/keyrings
 if [ "$TYPE" == "vps" ]; then
@@ -54,17 +67,17 @@ VPS_PACKAGES=(
     caddy
 )
 
-switch ($TYPE) {
-    case "personal":
+case "$TYPE" in
+    "personal")
         PACKAGES=($COMMON_PACKAGES $PERSONAL_PACKAGES)
-        break
-    case "vps":
+        ;;
+    "vps")
         PACKAGES=($COMMON_PACKAGES $VPS_PACKAGES)
-        break
-    default:
+        ;;
+    *)
         PACKAGES=($COMMON_PACKAGES)
-        break
-}
+        ;;
+esac
 
 sudo nala install -y ${PACKAGES[@]}
 
