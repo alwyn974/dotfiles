@@ -1,3 +1,5 @@
+#!/bin/env bash
+
 TYPE=($1:-vps) # personal/vps
 
 OLD_USER="$USER"
@@ -9,16 +11,20 @@ if [[ $EUID -eq 0 ]]; then
 fi
 
 sudo apt update -y
-sudo apt install ca-certificates curl gnupg nala -y # Docker & Nala
+sudo apt install ca-certificates curl gnupg -y # Docker & Nala
 
 # Add Docker's official GPG key:
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+if [ "$TYPE" == "vps" ]; then
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+else
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+fi
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
 # Add the repository to Apt sources:
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update -y
