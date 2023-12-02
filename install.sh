@@ -24,12 +24,15 @@ if [[ $EUID -eq 0 ]]; then
 fi
 
 sudo apt update -y
-sudo apt install ca-certificates curl gnupg -y # Docker & Nala
+sudo apt install ca-certificates curl gnupg debian-keyring debian-archive-keyring apt-transport-https -y # Docker, Caddy & Nala
 echo $TYPE
 # Add Docker's official GPG key:
 sudo install -m 0755 -d /etc/apt/keyrings
 if [ "$TYPE" == "vps" ]; then
     curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    # Add caddy source
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 else
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 fi
@@ -40,6 +43,7 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 sudo apt update -y
 
 COMMON_PACKAGES=(
